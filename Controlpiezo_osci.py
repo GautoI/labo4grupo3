@@ -53,7 +53,7 @@ print(fungen.query('*IDN?'))
 
 # tiempo = float(input("Introduzca el tiempo a medir: "))
 #frec = float(input("Introduzca la frecuencia de muestreo en Hz: "))
-pausa = 2
+pausa = 1
 frec1 = float(50080)
 frec2 = float(50120)
 paso = 1
@@ -83,11 +83,9 @@ print(datos)
 
 A = np.array(datos)
 
-nombre = input("Indique el nombre del archivo a guardar: ")
+nombre = input("CampanaResonancia")
 
 np.savetxt(str(nombre), A)
-
-import matplotlib.pyplot as plt
 
 
 plt.plot(A[:,0], A[:,4])
