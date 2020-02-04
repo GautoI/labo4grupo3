@@ -62,8 +62,8 @@ def medir(frecuencias):
     for freq in frecuencias:
         fungen.write('FREQ %f' % freq)
         time.sleep(0.1)
-        r = lockin.query_ascii_values('OUTP ?3')
-        t = lockin.query_ascii_values('OUTP ?4')
+        r = lockin.query_ascii_values('OUTP ?3')[0]
+        t = lockin.query_ascii_values('OUTP ?4')[0]
         Amplitud.append(r)
         fase.append(t)
         frecs.append(freq)
@@ -86,7 +86,7 @@ MedicionE1 = np.asarray(MedicionE1_list)
 #Max=max(Medicion1[0])
 
 #Data = np.append([MedicionE1, MedicionE2, MedicionE3,])
-np.savetxt('CampanaResonanciaLockIn', MedicionE1)
+np.savetxt('CampanaResonanciaLiVsalida3', MedicionE1)
 
 #%% 
 plt.figure()
@@ -115,5 +115,31 @@ plt.grid(True)
 plt.show()
 
 #%%
+
+frecuencia = MedicionE1[0]
+V2 = MedicionE1[1]
+V1 = 1/np.sqrt(2)
+transf = V2/V1
+ws = frecuencia[np.argmax(transf)]
+plt.figure
+plt.plot(frecuencia,transf)
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('Transferencia')
+#%%
+
+DatoEntrada = np.loadtxt('CampanaResonanciaLiVentrada3')
+DatoSalida = np.loadtxt('CampanaResonanciaLiVsalida3')
+
+frecuencia = DatoEntrada[0]
+V1 = DatoEntrada[2]
+
+V2 = DatoSalida[2]
+
+transf = V2/V1
+ws = frecuencia[np.argmax(transf)]
+
 plt.figure()
-plt.plot(MedicionE1[0,:],MedicionE1[1,:])
+plt.plot(frecuencia,transf)
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('Transferencia')
+
