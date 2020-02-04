@@ -53,7 +53,7 @@ print(fungen.query('*IDN?'))
 
 #%%
 pausa = 1
-freqs = np.linspace(50080,50120,400)
+freqs = np.linspace(50275,50295,400)
 
 def medir(frecuencias):
     Amplitud=[]
@@ -86,22 +86,22 @@ MedicionE1 = np.asarray(MedicionE1_list)
 #Max=max(Medicion1[0])
 
 #Data = np.append([MedicionE1, MedicionE2, MedicionE3,])
-np.savetxt('CampanaResonanciaLiVsalida3', MedicionE1)
+np.savetxt('CampanaAntiResonanciaLiVentrada3', MedicionE1)
 
 #%% 
-plt.figure()
-plt.errorbar(freqs,MedicionE1[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE2[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE3[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE4[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE5[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE6[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE7[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE8[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE9[0],fmt='o',yerr=std)
-plt.errorbar(freqs,MedicionE10[0],fmt="o",yerr=std)
-plt.grid(True)
-plt.show()
+# plt.figure()
+# plt.errorbar(freqs,MedicionE1[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE2[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE3[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE4[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE5[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE6[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE7[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE8[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE9[0],fmt='o',yerr=std)
+# plt.errorbar(freqs,MedicionE10[0],fmt="o",yerr=std)
+# plt.grid(True)
+# plt.show()
  
  
  #%% calculo errores voltaje
@@ -142,4 +142,43 @@ plt.figure()
 plt.plot(frecuencia,transf)
 plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Transferencia')
+#%%
+DatoEntrada = np.loadtxt('CampanaAntiResonanciaLiVentrada3')
+DatoSalida = np.loadtxt('CampanaAntiResonanciaLiVsalida3')
 
+frecuencia = DatoEntrada[0]
+V1 = DatoEntrada[2]
+
+V2 = DatoSalida[2]
+
+transf = V2/V1
+wp = frecuencia[np.argmin(transf)]
+
+plt.figure()
+plt.plot(frecuencia,transf)
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('Transferencia')
+
+#%%
+#Parametros
+R2 = 10000
+R2err = R2*0.05 
+
+
+Q = ws/(wmas - wmenos)
+#Qerr = np.sqrt((wserr/(wmas-wmenos))**2+(ws*wmaserr/(wmas-wmenos)**2)**2+(ws*wmenoserr/(wmas-wmenos)**2)**2)
+
+T = max(transf)
+#Terr = transferr[np.argmax(transf)]
+
+R = (R2/T) - R2
+#Rerr = (R2*Terr)/(T**2)
+
+L = (Q*R2)/(ws*T)
+#Lerr = np.sqrt(((R2*Qerr)/(ws*T))**2+((Q*R2*wserr)/(T*ws**2))**2+((Q*R2*Terr)/(ws*T**2))**2)
+
+C = 1/(L*ws**2)
+#Cerr = np.sqrt((Lerr/(L*ws)**2)**2+(wserr/(L*ws**3))**2)
+
+C2 = 1/((wp**2)*L - (1/C))
+#C2err =  np.sqrt(((Lerr*wp**2)/((wp**2)*L - (1/C))**2)**2+((Cerr)/(((wp**2)*L - (1/C))**2*C**2)**2)
