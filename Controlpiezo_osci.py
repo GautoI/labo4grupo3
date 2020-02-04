@@ -1,27 +1,4 @@
 
-
-
-from __future__ import division, unicode_literals, print_function, absolute_import
-import time
-import pyvisa as visa
-import numpy as np
-from matplotlib import pyplot as plt 
-#print(__doc__)
-# Este string determina el intrumento que van a usar.
-# Lo tienen que cambiar de acuerdo a lo que tengan conectado.
-
-resource_name1 = 'USB0::0x0699::0x0363::C108013::INSTR'
-
-rm1 = visa.ResourceManager()
-
-osci = rm1.open_resource(resource_name1)
-
-# Pide indentificacion
-print(osci.query('*IDN?'))
-
-#%%
-#######################################################################
-
 """
 Generador de funciones Tektronix AFG 3021B
 Manual U (web): https://github.com/hgrecco/labosdf-bin/raw/master/manuals/TektronixAFG3000.pdf
@@ -31,13 +8,27 @@ Manual P (local): \\Srvlabos\manuales\Tektronix\AFG3012B (Prog Manual).pdf
 """
 
 
+from __future__ import division, unicode_literals, print_function, absolute_import
+import time
+import pyvisa as visa
+import numpy as np
+from matplotlib import pyplot as plt 
 
 
+#Comunicación con el osciloscopio
+resource_name1 = 'USB0::0x0699::0x0363::C065087::INSTR'
 
-# Este string determina el intrumento que van a usar.
-# Lo tienen que cambiar de acuerdo a lo que tengan conectado.
+rm1 = visa.ResourceManager()
 
-resource_name2 = 'USB0::0x0699::0x0346::C034165::INSTR'
+osci = rm1.open_resource(resource_name1)
+
+# Pide indentificacion
+print(osci.query('*IDN?'))
+
+#%%
+#Comunicación con el generador de funciones
+
+resource_name2 = 'USB0::0x0699::0x0346::C036493::INSTR'
 
 rm2 = visa.ResourceManager()
 # Abre la sesion VISA de comunicacion
@@ -47,13 +38,11 @@ print(fungen.query('*IDN?'))
 
 
 #%%
-#######################################################################
-
-
+#Barrido de frecuencias
 
 # tiempo = float(input("Introduzca el tiempo a medir: "))
 #frec = float(input("Introduzca la frecuencia de muestreo en Hz: "))
-pausa = 1
+pausa = 3
 frec1 = float(50080)
 frec2 = float(50120)
 paso = 1
@@ -63,9 +52,9 @@ datos=[]
 # Rampa lineal de frequencias
 frecuencias = np.linspace(frec1, frec2, int((frec2-frec1)/paso)+1)
 for freq in frecuencias:
-    
-    time.sleep(pausa)	
+   
     fungen.write('FREQ %f' % freq)
+    time.sleep(pausa)	
     osci.write('MEASUrement:IMMed:SOURCE1')
     osci.write('MEASUrement:IMMed:TYPe CRMs')
     amplitudCh1 = osci.query('MEASU:IMM:VAL?')
@@ -83,16 +72,17 @@ print(datos)
 
 A = np.array(datos)
 
-nombre = input("CampanaResonancia")
+nombre = 'CampanaResonancia2'
 
 np.savetxt(str(nombre), A)
 
-
+plt.figure()
 plt.plot(A[:,0], A[:,4])
-plt.show()
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('Transferencia')
+#plt.show()
 
 # A = np.loadtxt("nombredelarchivo.txt")   <--- Esta linea es para cargar el archivo con los datos por si se lo quiere manipular desde Python despues de medir.
-
 
 fungen.close()
 osci.close()
